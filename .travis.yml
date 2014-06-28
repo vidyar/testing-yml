@@ -3,7 +3,7 @@ python:
   - "2.7"
 
 before_install:
-  - sudo apt-get install -qq -y slirp aufs-tools ca-certificates
+  - sudo apt-get install -qq -y cgroup-lite slirp aufs-tools ca-certificates
   - >
     sudo curl -sLo
     /usr/local/bin/docker
