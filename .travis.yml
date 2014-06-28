@@ -27,6 +27,7 @@ script: |
   cat > ./run.sh <<CMD
   #!/bin/bash
 
+  exit 0
   set -e
 
   # where to keep the docker pid
