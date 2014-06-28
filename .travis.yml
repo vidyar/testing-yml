@@ -66,4 +66,4 @@ script: |
   # run the script inside UML
   sudo ./sekexe/uml mem=1G rootfstype=hostfs rw \
     eth0=slirp,,/usr/bin/slirp-fullbolt \
-    init=$pwd)/run.sh
+    init=($pwd)/run.sh
