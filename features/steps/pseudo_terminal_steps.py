@@ -62,8 +62,8 @@ def step_impl(ctx):
             dockerpty.start(ctx.client, ctx.container)
         except:
             os_.exit(1)
-        else:
-            os._exit(0)
+
+        os._exit(0)
     else:
         tty = os.ttyname(fd)
         ctx.pty = fd
