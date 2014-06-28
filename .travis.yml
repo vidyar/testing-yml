@@ -13,7 +13,7 @@ before_install: |
 
   # grab sekexe (UML for docker)
   curl -sLo sekexe.zip \
-    https://github.com/jpetazzo/sekexe/archive/c5119f039140194f70a7ffa83e039b88960818c7.zip
+    https://github.com/d11wtq/sekexe/archive/master.zip
   unzip sekexe.zip
   mv sekexe-* ./sekexe
 
