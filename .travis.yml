@@ -65,4 +65,6 @@ script:
     chmod +x ./run.sh
 
     # run the script with sekexe
-    sudo ./sekexe/run $(pwd)/run.sh
+    sudo ./sekexe/run "$(pwd)/run.sh"
+
+  - exit $?
