@@ -29,11 +29,39 @@ script: |
 
   set -e
 
-  echo Stubbed
+  # where to keep the docker pid
+  PIDFILE=/var/run/docker.pid
+
+  # make sure docker stops at the end
+  stop_docker() {
+    (
+    if [[ -f \$PIDFILE ]]
+    then
+    kill \$(cat \$PIDFILE)
+    fi
+    )
+  }
+  trap stop_docker EXIT
+
+  # remount the cgroups
+  cgroups-umount
+  cgroups-mount
+
+  # make sure we're in this directory
+  cd $(pwd)
+
+  # start docker backgrounded
+  docker -d -p \$PIDFILE >/dev/null 2>&1 &
+
+  # wait for docker to be ready
+  sleep 5
+
+  # run the tests
+  $(which behave)
   CMD
 
   # make the script executable
   chmod +x ./run.sh
 
   # run the script with sekexe
-  sudo ./sekexe/run "$(pwd)/run.sh"; echo Huzzahhh; exit 0
+  sudo ./sekexe/run "$(pwd)/run.sh"
