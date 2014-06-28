@@ -1,66 +1,67 @@
 language: python
-python:
-  - "2.7"
+python: "2.7"
 
-before_install:
-  - sudo apt-get install -qq -y cgroup-lite slirp aufs-tools ca-certificates
-  - >
-    sudo curl -sLo
-    /usr/local/bin/docker
+before_install: |
+  # install apt dependencies
+  sudo apt-get install -qq -y cgroup-lite slirp aufs-tools ca-certificates
+
+  # grab the compatible version of docker
+  sudo curl -sLo \
+    /usr/local/bin/docker \
     https://get.docker.io/builds/Linux/x86_64/docker-1.0.0
-  - sudo chmod +x /usr/local/bin/docker
-  - >
-    curl -sLo sekexe.zip
+  sudo chmod +x /usr/local/bin/docker
+
+  # grab sekexe (UML for docker)
+  curl -sLo sekexe.zip \
     https://github.com/jpetazzo/sekexe/archive/c5119f039140194f70a7ffa83e039b88960818c7.zip
-  - unzip sekexe.zip
-  - mv sekexe-* ./sekexe
-  - sudo mkdir -p /var/lib/docker
-  - sudo mkdir -p /sys/fs/cgroup
+  unzip sekexe.zip
+  mv sekexe-* ./sekexe
 
-install:
-  - pip install -r requirements-dev.txt
+  # create docker dir on host (won't work from inside sekexe)
+  sudo mkdir -p /var/lib/docker
 
-script:
-  - |
-    # prepare a little bash script for sekexe
-    cat > ./run.sh <<CMD
-    #!/bin/bash
+install: pip install -r requirements-dev.txt
 
-    set -e
+script: |
+  # prepare a little bash script for sekexe
+  cat > ./run.sh <<CMD
+  #!/bin/bash
 
-    # where to keep the docker pid
-    PIDFILE=/var/run/docker.pid
+  set -e
 
-    # make sure docker stops at the end
-    stop_docker() {
-      (
-        if [[ -f \$PIDFILE ]]
-        then
-          kill \$(cat \$PIDFILE)
-        fi
-      )
-    }
-    trap stop_docker EXIT
+  # where to keep the docker pid
+  PIDFILE=/var/run/docker.pid
 
-    # remount the cgroups
-    cgroups-umount
-    cgroups-mount
+  # make sure docker stops at the end
+  stop_docker() {
+    (
+    if [[ -f \$PIDFILE ]]
+    then
+    kill \$(cat \$PIDFILE)
+    fi
+    )
+  }
+  trap stop_docker EXIT
 
-    # make sure we're in this directory
-    cd $(pwd)
+  # remount the cgroups
+  cgroups-umount
+  cgroups-mount
 
-    # start docker backgrounded
-    docker -d -p \$PIDFILE >/dev/null 2>&1 &
+  # make sure we're in this directory
+  cd $(pwd)
 
-    # wait for docker to be ready
-    sleep 5
+  # start docker backgrounded
+  docker -d -p \$PIDFILE >/dev/null 2>&1 &
 
-    # run the tests
-    $(which behave)
-    CMD
+  # wait for docker to be ready
+  sleep 5
 
-    # make the script executable
-    chmod +x ./run.sh
+  # run the tests
+  $(which behave)
+  CMD
 
-    # run the script with sekexe
-    sudo ./sekexe/run "$(pwd)/run.sh"; echo Huzzahhh; exit 0
+  # make the script executable
+  chmod +x ./run.sh
+
+  # run the script with sekexe
+  sudo ./sekexe/run "$(pwd)/run.sh"; echo Huzzahhh; exit 0
