@@ -27,7 +27,6 @@ script: |
   cat > ./run.sh <<CMD
   #!/bin/bash
 
-  exit 0
   set -e
 
   # where to keep the docker pid
@@ -64,5 +63,7 @@ script: |
   # make the script executable
   chmod +x ./run.sh
 
-  # run the script with sekexe
-  sudo ./sekexe/run "$(pwd)/run.sh"
+  # run the script inside UML
+  sudo ./sekexe/uml mem=1G rootfstype=hostfs rw \
+    eth0=slirp,,/usr/bin/slirp-fullbolt \
+    init=$pwd)/run.sh
