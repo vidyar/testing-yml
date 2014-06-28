@@ -28,8 +28,21 @@ script:
 
     set -xe
 
+    # where to keep the docker pid
+    PIDFILE=/var/run/docker.pid
+
     # make sure docker stops at the end
-    trap 'kill $(jobs -p)' EXIT SIGINT SIGTERM
+    stop_docker() {
+      (
+        exec >/dev/null 2>&1
+
+        if [[ -f \$PIDFILE ]]
+        then
+          kill \$(cat \$PIDFILE)
+        fi
+      )
+    }
+    trap stop_docker EXIT
 
     # remount the cgroups
     cgroups-umount
@@ -39,7 +52,7 @@ script:
     cd $(pwd)
 
     # start docker backgrounded
-    docker -d &
+    docker -d -p \$PIDFILE &
 
     # wait for docker to be ready
     sleep 5
