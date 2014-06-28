@@ -31,8 +31,9 @@ script:
     # make sure docker stops at the end
     trap 'kill $(jobs -p)' EXIT SIGINT SIGTERM
 
-    # mount the cgroups
-    mount -n -t tmpfs -o uid=0,gid=0,mode=0755 cgroup /sys/fs/cgroup
+    # remount the cgroups
+    cgroups-umount
+    cgroups-mount
 
     # make sure we're in this directory
     cd $(pwd)
